@@ -2,7 +2,7 @@
 #define __JOYSTICK_H__
 
 // copied from internet
-// [LINK]
+// TODO: [INSERT LINK]
 void ADC_init() {
 	// AREF = AVcc
 	ADMUX = (1<<REFS0);
@@ -12,6 +12,8 @@ void ADC_init() {
 	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
+// also copied from internet
+// TODO: [INSERT SAME LINK]
 uint16_t adc_read(uint8_t ch) {
 	// select the corresponding channel 0~7
 	// ANDing with ’7? will always keep the value
