@@ -44,7 +44,7 @@ enum JOYSTICK_POSITIONS getJoystickInput() {
 	
 	value_y = adc_read(0);
 	value_x = adc_read(1) / 8;
-	
+	//PORTB = value_x;
 	if ((unsigned char)value_y > 200 && (unsigned char)value_x < 70
 		&& (unsigned char)value_x >= 64) { // up
 		return UP;
@@ -53,7 +53,7 @@ enum JOYSTICK_POSITIONS getJoystickInput() {
 		 && (unsigned char)value_x >= 64) { // down
 		return DOWN;
 	}
-	else if((unsigned char)value_x <= 22 && (unsigned char)value_x >= 2
+	else if((unsigned char)value_x <= 15 && (unsigned char)value_x >= 2
 		 && (unsigned char)value_y >= 128 && (unsigned char)value_y < 140) { // left
 		return LEFT;
 	}
