@@ -41,24 +41,24 @@ enum JOYSTICK_POSITIONS joystick_position = NONE;
 enum JOYSTICK_POSITIONS getJoystickInput() {
 	unsigned short value_x = 0;
 	unsigned short value_y = 0;
-	
-	value_y = adc_read(0);
+	PORTA |= 0x0F;
+	value_y = adc_read(0) / 8;
 	value_x = adc_read(1) / 8;
-	//PORTB = value_x;
-	if ((unsigned char)value_y > 200 && (unsigned char)value_x < 70
-		&& (unsigned char)value_x >= 64) { // up
+	PORTB = value_y;
+	if ((unsigned char)value_y >= 20 && (unsigned char)value_y <= 28 && (unsigned char)value_x < 70
+	&& (unsigned char)value_x >= 64) { // up
 		return UP;
 	}
-	else if ((unsigned char)value_y < 20 && (unsigned char)value_x < 70
-		 && (unsigned char)value_x >= 64) { // down
+	else if ((unsigned char)value_y <= 12 && (unsigned char)value_x < 70
+	&& (unsigned char)value_x >= 64) { // down
 		return DOWN;
 	}
-	else if((unsigned char)value_x <= 15 && (unsigned char)value_x >= 2
-		 && (unsigned char)value_y >= 128 && (unsigned char)value_y < 140) { // left
+	else if((unsigned char)value_x <= 15 && (unsigned char)value_x >= 1
+	&& (unsigned char)value_y >= 12 && (unsigned char)value_y < 20) { // left
 		return LEFT;
 	}
 	else if ((unsigned char)value_x > 120 && (unsigned char)value_x <= 130
-		 && (unsigned char)value_y < 140 && (unsigned char)value_y >= 128) { // right
+	&& (unsigned char)value_y >= 12 && (unsigned char)value_y < 20) { // right
 		return RIGHT;
 	}
 	return NONE;

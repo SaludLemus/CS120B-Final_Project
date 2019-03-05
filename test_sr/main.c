@@ -132,7 +132,7 @@ enum JOYSTICK_POSITIONS getJoystickInput() {
 	return NONE;
 }
 
-char test_map[8][8] =
+unsigned char test_map[8][8] =
 {
 	{0,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
