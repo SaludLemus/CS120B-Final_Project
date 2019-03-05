@@ -2,7 +2,7 @@
 #define __JOYSTICK_H__
 
 // copied from internet
-// TODO: [INSERT LINK]
+// LINK: http://maxembedded.com/2011/06/the-adc-of-the-avr/
 void ADC_init() {
 	// AREF = AVcc
 	ADMUX = (1<<REFS0);
@@ -13,7 +13,7 @@ void ADC_init() {
 }
 
 // also copied from internet
-// TODO: [INSERT SAME LINK]
+// LINK: http://maxembedded.com/2011/06/the-adc-of-the-avr/
 uint16_t adc_read(uint8_t ch) {
 	// select the corresponding channel 0~7
 	// ANDing with ’7? will always keep the value
