@@ -132,7 +132,7 @@ enum JOYSTICK_POSITIONS getJoystickInput() {
 	return NONE;
 }
 
-char pacman_map[8][8] =
+char test_map[8][8] =
 {
 	{0,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
@@ -162,7 +162,7 @@ int main(void)
     while (1) {
 		if (joystick_timer >= 50) {
 			joystick_position = getJoystickInput();
-			pacman_map[player_pos_row][player_pos_col] = 1;
+			test_map[player_pos_row][player_pos_col] = 1;
 			switch (joystick_position) {
 				case UP:
 					if (player_pos_row > 0) {--player_pos_row;}
@@ -179,7 +179,7 @@ int main(void)
 				default:
 					break;
 			}
-			pacman_map[player_pos_row][player_pos_col] = 0;
+			test_map[player_pos_row][player_pos_col] = 0;
 			joystick_timer = 0;
 		}
 		stuff_1();
@@ -204,7 +204,7 @@ void stuff_1() {
 		for (row = 0; row < 8; ++row) { // data to send --> rows
 			// [column] is constant --> current column
 			// [row] is not constant --> iterate through rows
-			row_values |= (pacman_map[row][column] << row);
+			row_values |= (test_map[row][column] << row);
 		}
 		
 		transmit_data(row_values, 1); // send current row data
