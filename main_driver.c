@@ -14,9 +14,6 @@
 #include "joystick.h"
 #include "led_matrix_display.h"
 
-unsigned char player_pos_row = 0;
-unsigned char player_pos_col = 0;
-
 int main() {
 	 DDRD = 0xFF; PORTD = 0x00; // PD is output
 	 DDRA = 0xF0; PORTA = 0x0F; // PA is output

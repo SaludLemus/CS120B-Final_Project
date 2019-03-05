@@ -1,16 +1,23 @@
 #ifndef __LED_MATRIX_DISPLAY_H__
 #define __LED_MATRIX_DISPLAY_H__
 
+/*
+	player_pos_row --> current row
+	player_pos_col --> current column
+*/
+unsigned char player_pos_row = 6;
+unsigned char player_pos_col = 4;
+
 // game map for the game
 unsigned char game_map[8][8] =
 {
-	{0,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1},
+	{1,1,1,1,0,1,1,1},
 	{1,1,1,1,1,1,1,1}
 };
 
