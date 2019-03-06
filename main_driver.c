@@ -162,6 +162,9 @@ int TickFunct_Display(int state) {
 				displayLEDMatrix(); // turn all the leds off
 			}
 			break;
+		default:
+			state = DisplayInit;
+			break;
 	}
 	
 	switch (state) { // state actions
