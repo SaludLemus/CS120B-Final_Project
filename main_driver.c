@@ -21,14 +21,14 @@ int main() {
 	 
 	 ADC_init();
 	 
-	 TimerSet(1); // 500 ms --> 1/2 a second
+	 TimerSet(1); // 1ms
 	 TimerOn();
 	 
 	 unsigned char joystick_timer = 50;
 	 while (1) {
 		 if (joystick_timer >= 50) {
 			 joystick_position = getJoystickInput();
-			 game_map[player_pos_row][player_pos_col] = 1;
+			 game_map[player_pos_row][player_pos_col] = 0;
 			 switch (joystick_position) {
 				 case UP:
 					if (player_pos_row > 0) {--player_pos_row;}
@@ -45,10 +45,20 @@ int main() {
 				 default:
 					break;
 			 }
-			 game_map[player_pos_row][player_pos_col] = 0;
+			 game_map[player_pos_row][player_pos_col] = 3;
 			 joystick_timer = 0;
 		 }
 		 displayLEDMatrix();
+		/*transmit_data(0, 0);
+		transmit_data(0x01, 0);
+		transmit_data(0xFE, 1);
+		transmit_data(0xFF, 3);
+		 while (!TimerFlag) {}
+		 TimerFlag = 0; // start over
+		 transmit_data(0, 0);
+		 transmit_data(0x80, 0);
+		 transmit_data(0xFE, 3);
+		 transmit_data(0xFF, 1);*/
 		 while (!TimerFlag) {}
 		 TimerFlag = 0; // start over
 		 joystick_timer += 1;
