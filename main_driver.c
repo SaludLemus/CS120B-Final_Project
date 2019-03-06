@@ -50,15 +50,15 @@ int main() {
 		 }
 		 displayLEDMatrix();
 		/*transmit_data(0, 0);
-		transmit_data(0x01, 0);
 		transmit_data(0xFE, 1);
-		transmit_data(0xFF, 3);
+		transmit_data(0x7F, 3);
+		transmit_data(0x01, 0);
 		 while (!TimerFlag) {}
 		 TimerFlag = 0; // start over
 		 transmit_data(0, 0);
-		 transmit_data(0x80, 0);
-		 transmit_data(0xFE, 3);
-		 transmit_data(0xFF, 1);*/
+		  transmit_data(0xFE, 3);
+		  transmit_data(0x7F, 1);
+		 transmit_data(0x80, 0);*/
 		 while (!TimerFlag) {}
 		 TimerFlag = 0; // start over
 		 joystick_timer += 1;
