@@ -373,6 +373,57 @@ void generateNewEnemy() {
 	return;
 }
 
+enum HitDetectionStates {HitDectectionInit, HitDetectionOff, HitDetectionOn} hit_detection_state;
+
+int TickFunct_HitDetection(int state) {
+	
+	switch (state) { // state transitions
+		case HitDectectionInit:
+			state = HitDetectionOff;
+			game_over = 0;
+			break;
+		case HitDetectionOff:
+			if (game_on) {
+				state = HitDetectionOn;
+				game_over = 0;
+			}
+			else if (!game_on) {
+				state = HitDetectionOff;
+			}
+			break;
+		case HitDetectionOn:
+			if (game_on) {
+				state = HitDetectionOn;
+				
+				// detect when the player's row is the same as the enemy and not the same column
+				// as the open column (the led that is not on)
+				if ((player_pos_row == enemy_row_num) && (player_pos_col != open_column)) {
+					game_over = 1;
+				}
+			}
+			else if (!game_on) {
+				state = HitDetectionOff;
+			}
+			break;
+		default:
+			state = HitDectectionInit;
+			break;
+	}
+	
+	switch (state) { // state actions
+		case HitDectectionInit:
+			break;
+		case HitDetectionOff:
+			break;
+		case HitDetectionOn:
+			break;
+		default:
+			break;
+	}
+	
+	return state;
+}
+
 int main() {
 	 DDRD = 0xFF; PORTD = 0x00; // PD is output (shift register handles red leds)
 	 DDRA = 0xF0; PORTA = 0x0F; // PA is output
