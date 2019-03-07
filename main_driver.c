@@ -264,7 +264,7 @@ unsigned char enemy_row[1][8];
 unsigned char is_column_open; // used to determine whether an open column has been filled already
 signed char enemy_row_num; // current row number of the enemy
 signed char open_column; // current open column of the current row
-unsigned char is_score; // whether the player passed the enemy row
+unsigned char is_scored; // whether the player passed the enemy row
 
 /*
 	is _score is 0 before the first enemy is created and before a new enemy is created
@@ -285,13 +285,13 @@ int TickFunct_Enemy(int state) {
 			enemy_row_num = -1;
 			is_column_open = 0;
 			open_column = -1;
-			is_score = 0;
+			is_scored = 0;
 			break;
 		case EnemyOff:
 			if (game_on) { // game is starting
 				state = EnemyMove;
 				
-				is_score = 0;
+				is_scored = 0;
 				generateNewEnemy(); // create new enemy
 			}
 			else if (!game_on) { // game is still not on
@@ -310,7 +310,7 @@ int TickFunct_Enemy(int state) {
 						}
 					}
 					
-					++enemy_row_num; // go to next row
+					++enemy_row_num; // move to the next row
 					
 					// update the map with the new row --> get values from enemy_row 2D array
 					for (i = 0; i < 8; ++i) { // iterate through current row's columns
@@ -331,7 +331,7 @@ int TickFunct_Enemy(int state) {
 					 enemy_row_num = -1; // go back to row -1
 					 is_column_open = 0; // reset bool var
 					 open_column = -1; // get new open column
-					 is_score = 0; // reset
+					 is_scored = 0; // reset
 					 generateNewEnemy(); // generate new enemy
 				}
 			}
@@ -340,7 +340,7 @@ int TickFunct_Enemy(int state) {
 				is_column_open = 0;
 				open_column = -1;
 				enemy_row_num = -1;
-				is_score = 0;
+				is_scored = 0;
 			}
 			break;
 		default:
@@ -437,48 +437,59 @@ int TickFunct_HitDetection(int state) {
 	return state;
 }
 
-enum DecrementStates {DecrementInit, DecrementOff, DecrementOn} decrement_state;
+enum UpdateScoreStates {UpdateScoreInit, UpdateScoreOff, UpdateScoreOn} update_score_state;
 
+unsigned char player_score; // player's score throughout the game
 unsigned long int enemy_period; // a period for the enemy that moves faster as enemy_period is smaller
 
-int TickFunct_Decrement(int state) {
+int TickFunct_UpdateScore(int state) {
 	
-	switch (state) {
-		case DecrementInit:
-			state = DecrementOff;
+	switch (state) { // state transitions
+		case UpdateScoreInit:
+			state = UpdateScoreOff;
+			player_score = 0;
 			enemy_period = 1500;
 			break;
-		case DecrementOff:
+		case UpdateScoreOff:
 			if (game_on) {
-				state = DecrementOn;
+				state = UpdateScoreOn;
+				player_score = 0;
 				enemy_period = 1500; // the enemy moves (i.e. ticks) every 1 and a half seconds
 			}
 			else if (!game_on) {
-				state = DecrementOff;
+				state = UpdateScoreOff;
 			}
 			break;
-		case DecrementOn:
-			if (game_on) { // game is still on
-				state = DecrementOn;
-				if (is_score && enemy_period >= 200) { // the player scored
-					enemy_period -= 150; // decrement 150 ms --> move faster (i.e. tick faster)
+		case UpdateScoreOn:
+			if (game_on) {
+				state = UpdateScoreOn;
+				
+				// update score when the player's row is greater than the enemy's row
+				// and have not updated the score for the current enemy
+				if (!is_scored && (player_pos_row > enemy_row_num)) {
+					++player_score; // add one to current score
+					is_scored = 1; // not update anymore until new enemy is generated
+					
+					if (enemy_period > 200) { // make enemy move faster (i.e. tick faster)
+						enemy_period -= 150;	
+					}
 				}
 			}
 			else if (!game_on) {
-				state = DecrementOff;
+				state = UpdateScoreOff;
 			}
 			break;
 		default:
-			state = DecrementInit;
+			state = UpdateScoreInit;
 			break;
 	}
 	
-	switch (state) {
-		case DecrementInit:
+	switch (state) { // state actions
+		case UpdateScoreInit:
 			break;
-		case DecrementOff:
+		case UpdateScoreOff:
 			break;
-		case DecrementOn:
+		case UpdateScoreOn:
 			break;
 		default:
 			break;
@@ -486,8 +497,6 @@ int TickFunct_Decrement(int state) {
 	
 	return state;
 }
-
-
 
 int main() {
 	 DDRD = 0xFF; PORTD = 0x00; // PD is output (shift register handles red leds)
