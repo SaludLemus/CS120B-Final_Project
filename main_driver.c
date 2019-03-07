@@ -270,7 +270,7 @@ unsigned char is_scored; // whether the player passed the enemy row
 	is _score is 0 before the first enemy is created and before a new enemy is created
 */
 
-void generateNewEnemy(); // generates new enemy by assign values to the 2D array
+void generateNewEnemy(); // generates new enemy by assigning new values to the 2D array
 /*
 	function updates is_column_open, open_column, and enemy_row
 */
@@ -299,7 +299,7 @@ int TickFunct_Enemy(int state) {
 			}
 			break;
 		case EnemyMove:
-			if (game_on) {
+			if (game_on) { // the game is still going on
 				state = EnemyMove;
 				
 				if (enemy_row_num < 7) { // move down one row
@@ -396,16 +396,16 @@ int TickFunct_HitDetection(int state) {
 			game_over = 0;
 			break;
 		case HitDetectionOff:
-			if (game_on) {
+			if (game_on) { // the game is about to start
 				state = HitDetectionOn;
 				game_over = 0;
 			}
-			else if (!game_on) {
+			else if (!game_on) { // the user still has not pressed the button
 				state = HitDetectionOff;
 			}
 			break;
 		case HitDetectionOn:
-			if (game_on) {
+			if (game_on) { // the game is on
 				state = HitDetectionOn;
 				
 				// detect when the player's row is the same as the enemy and not the same column
@@ -414,7 +414,7 @@ int TickFunct_HitDetection(int state) {
 					game_over = 1;
 				}
 			}
-			else if (!game_on) {
+			else if (!game_on) { // the game is over
 				state = HitDetectionOff;
 			}
 			break;
@@ -451,17 +451,17 @@ int TickFunct_UpdateScore(int state) {
 			enemy_period = 1500;
 			break;
 		case UpdateScoreOff:
-			if (game_on) {
+			if (game_on) { // the game is about to start
 				state = UpdateScoreOn;
 				player_score = 0;
 				enemy_period = 1500; // the enemy moves (i.e. ticks) every 1 and a half seconds
 			}
-			else if (!game_on) {
+			else if (!game_on) { // the user still has not pressed the button
 				state = UpdateScoreOff;
 			}
 			break;
 		case UpdateScoreOn:
-			if (game_on) {
+			if (game_on) { // the game is still going on
 				state = UpdateScoreOn;
 				
 				// update score when the player's row is greater than the enemy's row
@@ -475,7 +475,7 @@ int TickFunct_UpdateScore(int state) {
 					}
 				}
 			}
-			else if (!game_on) {
+			else if (!game_on) { // the game is over
 				state = UpdateScoreOff;
 			}
 			break;
