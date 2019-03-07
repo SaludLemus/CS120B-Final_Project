@@ -11,6 +11,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdlib.h> // used for generating random numbers
+#include "io.c"
 #include "timer.h"
 #include "joystick.h"
 #include "led_matrix_display.h"
