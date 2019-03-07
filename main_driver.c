@@ -222,6 +222,11 @@ int TickFunct_Player(int state) {
 						break;
 				}
 				game_map[player_pos_row][player_pos_col] = 3; // turn new position to blue
+				/* ---------------SUGGESTION-----------------
+				// might add if statement to check if player's position is equal to [row][!open_column} of the enemy
+				//			- i.e. player_pos_row == enemy_row_num && player_pos_col != open_column
+				//	if so, update game_over flag
+				*/
 			}
 			else if (!game_on) { // player lost the game
 				state = PlayerOff;
@@ -304,6 +309,11 @@ int TickFunct_Enemy(int state) {
 					for (i = 0; i < 8; ++i) { // iterate through current row's columns
 						game_map[enemy_row_num][i] = enemy_row[0][i];
 					}
+					/* ---------------SUGGESTION-----------------
+					// might add if statement to check if player's position is equal to current [row][column] of the enemy
+					//			- i.e. player_pos_row == enemy_row_num && player_pos_col != open_column
+					//	if so, update game_over flag
+					*/
 				}
 				else if (!(enemy_row_num < 7)) {
 					 // enemy is on the last row --> "delete it" and "replace it" with a new enemy (i.e. start over)
