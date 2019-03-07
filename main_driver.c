@@ -499,6 +499,67 @@ int TickFunct_UpdateScore(int state) {
 	return state;
 }
 
+enum EndGameStates {EndGameInit, EndGameOff, EndGamePlaying,
+					EndGameEndGame, EndGameGameOver, EndGamePlayerScore,
+					EndGameHighScore} end_game_state;
+
+int TickFunct_Endgame(int state) {
+	
+	switch (state) {
+		case EndGameInit:
+			state = EndGameOff;
+			break;
+		case EndGameOff:
+		
+			break;
+		case EndGamePlaying:
+		
+			break;
+		case EndGameEndGame:
+		
+			break;
+		case EndGameGameOver:
+		
+			break;
+		case EndGamePlayerScore:
+			
+			break;
+		case EndGameHighScore:
+		
+			break;
+		default:
+			state = EndGameInit;
+			break;
+	}
+	
+	switch (state) {
+		case EndGameInit:
+			break;
+		case EndGameOff:
+		
+			break;
+		case EndGamePlaying:
+		
+			break;
+		case EndGameEndGame:
+		
+			break;
+		case EndGameGameOver:
+		
+			break;
+		case EndGamePlayerScore:
+		
+			break;
+		case EndGameHighScore:
+		
+			break;
+		default:
+			break;
+	}
+	
+	return state;
+}
+
 int main() {
 	 DDRD = 0xFF; PORTD = 0x00; // PD is output (shift register handles red leds)
 	 DDRA = 0xF0; PORTA = 0x0F; // PA is output
