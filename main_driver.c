@@ -264,6 +264,7 @@ unsigned char enemy_row[1][8];
 unsigned char is_column_open; // used to determine whether an open column has been filled already
 signed char enemy_row_num; // current row number of the enemy
 signed char open_column; // current open column of the current row
+unsigned char is_score; // whether the player passed the enemy row
 
 void generateNewEnemy(); // generates new enemy by assign values to the 2D array
 /*
@@ -285,6 +286,7 @@ int TickFunct_Enemy(int state) {
 			if (game_on) { // game is starting
 				state = EnemyMove;
 				
+				is_score = 0;
 				generateNewEnemy(); // create new enemy
 			}
 			else if (!game_on) { // game is still not on
@@ -324,6 +326,7 @@ int TickFunct_Enemy(int state) {
 					 enemy_row_num = -1; // go back to row -1
 					 is_column_open = 0; // reset bool var
 					 open_column = -1; // get new open column
+					 is_score = 0; // reset
 					 generateNewEnemy(); // generate new enemy
 				}
 			}
@@ -332,6 +335,7 @@ int TickFunct_Enemy(int state) {
 				is_column_open = 0;
 				open_column = -1;
 				enemy_row_num = -1;
+				is_score = 0;
 			}
 			break;
 		default:
