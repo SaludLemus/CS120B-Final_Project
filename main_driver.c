@@ -180,10 +180,77 @@ int TickFunct_Display(int state) {
 	return state;
 }
 
+enum PlayerStates {PlayerInit, PlayerOff, PlayerMove} player_state;
+
+int TickFunct_Player(int state) {
+	
+	switch (state) { // state transition
+		case PlayerInit:
+			state = PlayerOff;
+			break;
+		case PlayerOff:
+			if (game_on) { // game is starting
+				state = PlayerMove;
+				player_pos_row = 6; // set player position
+				player_pos_col = 4;
+			}
+			else if (!game_on) { // game has not started yet
+				state = PlayerOff;
+			}
+			break;
+		case PlayerMove:
+			if (game_on) { // game is still on --> continue to get joystick input
+				state = PlayerMove;
+				
+				joystick_position = getJoystickInput(); // get current player input
+				game_map[player_pos_row][player_pos_col] = 0; // turn off old position
+				switch (joystick_position) {
+					case UP: // moved up
+						if (player_pos_row > 0) {--player_pos_row;}
+						break;
+					case DOWN: // moved down
+						if (player_pos_row < 7) {++player_pos_row;}
+						break;
+					case LEFT: // moved left
+						if (player_pos_col > 0) {--player_pos_col;}
+						break;
+					case RIGHT: // moved right
+						if (player_pos_col < 7) {++player_pos_col;}
+						break;
+					default: // did not move
+						break;
+				}
+				game_map[player_pos_row][player_pos_col] = 3; // turn new position to blue
+			}
+			else if (!game_on) { // player lost the game
+				state = PlayerOff;
+				player_pos_col = 0; // make player's position 0
+				player_pos_row = 0;
+			}
+			break;
+		default:
+			state = PlayerInit;
+			break;
+	}
+	
+	switch (state) { // state actions
+		case PlayerInit:
+			break;
+		case PlayerOff:
+			break;
+		case PlayerMove:
+			break;
+		default:
+			break;
+	}
+	
+	return state;
+}
+
 int main() {
-	 DDRD = 0xFF; PORTD = 0x00; // PD is output
+	 DDRD = 0xFF; PORTD = 0x00; // PD is output (shift register handles red leds)
 	 DDRA = 0xF0; PORTA = 0x0F; // PA is output
-	 DDRB = 0xFF; PORTB = 0x00;
+	 DDRB = 0xFF; PORTB = 0x00; // PB is output (shift register handles blue leds)
 	 
 	 ADC_init();
 	 
