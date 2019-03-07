@@ -17,7 +17,7 @@
 
 typedef struct _task {
 	unsigned char state; // current state in SM
-	unsigned long int period; // task's period to tick
+	unsigned long int* period; // task's period to tick
 	unsigned long int elapsedTime; // how long has passed
 	int (*TickFct)(int); // tick function
 } task;
@@ -266,6 +266,10 @@ signed char enemy_row_num; // current row number of the enemy
 signed char open_column; // current open column of the current row
 unsigned char is_score; // whether the player passed the enemy row
 
+/*
+	is _score is 0 before the first enemy is created and before a new enemy is created
+*/
+
 void generateNewEnemy(); // generates new enemy by assign values to the 2D array
 /*
 	function updates is_column_open, open_column, and enemy_row
@@ -281,6 +285,7 @@ int TickFunct_Enemy(int state) {
 			enemy_row_num = -1;
 			is_column_open = 0;
 			open_column = -1;
+			is_score = 0;
 			break;
 		case EnemyOff:
 			if (game_on) { // game is starting
@@ -427,6 +432,58 @@ int TickFunct_HitDetection(int state) {
 	
 	return state;
 }
+
+enum DecrementStates {DecrementInit, DecrementOff, DecrementOn} decrement_state;
+
+unsigned long int enemy_period; // a period for the enemy that moves faster as enemy_period is smaller
+
+int TickFunct_Decrement(int state) {
+	
+	switch (state) {
+		case DecrementInit:
+			state = DecrementOff;
+			enemy_period = 1500;
+			break;
+		case DecrementOff:
+			if (game_on) {
+				state = DecrementOn;
+				enemy_period = 1500; // the enemy moves (i.e. ticks) every 1 and a half seconds
+			}
+			else if (!game_on) {
+				state = DecrementOff;
+			}
+			break;
+		case DecrementOn:
+			if (game_on) { // game is still on
+				state = DecrementOn;
+				if (is_score && enemy_period >= 200) { // the player scored
+					enemy_period -= 150; // decrement 150 ms --> move faster (i.e. tick faster)
+				}
+			}
+			else if (!game_on) {
+				state = DecrementOff;
+			}
+			break;
+		default:
+			state = DecrementInit;
+			break;
+	}
+	
+	switch (state) {
+		case DecrementInit:
+			break;
+		case DecrementOff:
+			break;
+		case DecrementOn:
+			break;
+		default:
+			break;
+	}
+	
+	return state;
+}
+
+
 
 int main() {
 	 DDRD = 0xFF; PORTD = 0x00; // PD is output (shift register handles red leds)
