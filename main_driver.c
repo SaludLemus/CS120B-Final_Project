@@ -55,8 +55,8 @@ int TickFunct_GameMenu(int state) {
 			break;
 			
 		case GameMenuOff:
-			// PA2 --> start button
-			if (~PINA & 0x04) { // start button pressed
+			// PA2 --> start/reset button
+			if (~PINA & 0x04) { // button pressed
 				state = GameMenuPlay;
 				game_on = 1; // start playing the game
 			}
@@ -88,12 +88,12 @@ int TickFunct_GameMenu(int state) {
 			break;
 			
 		case GameMenuWait:
-			// PA3 --> reset button
-			if (~PINA & 0x08) { // reset button pressed
+			// PA2 --> start/reset button
+			if (~PINA & 0x04) { // button pressed
 				state = GameMenuPlay;
 				game_on = 1;
 			}
-			else if (!(~PINA & 0x08)) { // still not press reset button
+			else if (!(~PINA & 0x04)) { // still not press button
 				state = GameMenuWait;
 			}
 			break;
