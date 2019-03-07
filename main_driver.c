@@ -374,7 +374,11 @@ void generateNewEnemy() {
 			is_column_open = 1; // found open column
 			open_column = i; // open column is column i
 		}
-		
+		else if (i == 7 && !is_column_open) { // make the last column not light up if not achieved before
+			is_column_open = 1;
+			enemy_row[0][i] = 0;
+			open_column = i;
+		}
 		else { // either the open column has been filled or result is 1 after %
 			enemy_row[0][i] = 1; // make current column 1 (1 is for red led)s
 		}
