@@ -10,6 +10,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdlib.h> // used for generating random numbers
 #include "timer.h"
 #include "joystick.h"
 #include "led_matrix_display.h"
@@ -245,6 +246,121 @@ int TickFunct_Player(int state) {
 	}
 	
 	return state;
+}
+
+enum EnemyStates {EnemyInit, EnemyOff, EnemyMove} enemy_state;
+
+unsigned char enemy_row[1][8];
+/*
+	enemy_current_row --> current row to display red
+		- the first time game_on is 1 --> generate random numbers, only one column can be off
+*/
+
+unsigned char is_column_open; // used to determine whether an open column has been filled already
+signed char enemy_row_num; // current row number of the enemy
+signed char open_column; // current open column of the current row
+
+void generateNewEnemy(); // generates new enemy by assign values to the 2D array
+/*
+	function updates is_column_open, open_column, and enemy_row
+*/
+
+int TickFunct_Enemy(int state) {
+	unsigned char i;
+	
+	switch (state) { // state transitions
+		case EnemyInit:
+			state = EnemyOff;
+			
+			enemy_row_num = -1;
+			is_column_open = 0;
+			open_column = -1;
+			break;
+		case EnemyOff:
+			if (game_on) { // game is starting
+				state = EnemyMove;
+				
+				generateNewEnemy(); // create new enemy
+			}
+			else if (!game_on) { // game is still not on
+				state = EnemyOff;
+			}
+			break;
+		case EnemyMove:
+			if (game_on) {
+				state = EnemyMove;
+				
+				if (enemy_row_num < 7) { // move down one row
+					// current row is 0 or 1 or 2 or ... or 6
+					if (enemy_row_num >= 0) { // clear the current row in map --> assign it 0
+						for (i = 0; i < 8; ++i) { // iterate through current row and update columns
+							game_map[enemy_row_num][i] = 0;
+						}
+					}
+					
+					++enemy_row_num; // go to next row
+					
+					// update the map with the new row --> get values from enemy_row 2D array
+					for (i = 0; i < 8; ++i) { // iterate through current row's columns
+						game_map[enemy_row_num][i] = enemy_row[0][i];
+					}
+				}
+				else if (!(enemy_row_num < 7)) {
+					 // enemy is on the last row --> "delete it" and "replace it" with a new enemy (i.e. start over)
+					 for (i = 0; i < 8; ++i) { // delete current row's columns
+						 game_map[enemy_row_num][i] = 0; // assign 0 --> do not turn led on
+					 }
+					 
+					 enemy_row_num = -1; // go back to row -1
+					 is_column_open = 0; // reset bool var
+					 open_column = -1; // get new open column
+					 generateNewEnemy(); // generate new enemy
+				}
+			}
+			else if (!game_on) { // game is over --> reset local variables
+				state = EnemyOff;
+				is_column_open = 0;
+				open_column = -1;
+				enemy_row_num = -1;
+			}
+			break;
+		default:
+			state = EnemyInit;
+			break;
+	}
+	
+	switch (state) { // state actions
+		case EnemyInit:
+			break;
+		case EnemyOff:
+			break;
+		case EnemyMove:
+			break;
+		default:
+			break;
+	}
+	
+	return state;
+}
+
+void generateNewEnemy() {
+	unsigned char i;
+	unsigned short random_num;
+	
+	for (i = 0; i < 8; ++i) { // iterate through columns and fill them with 0 or 1
+		random_num = ((unsigned short)(rand())) % 2; // generate random number
+		
+		if ((random_num == 0) && !is_column_open) { // found open column for enemy row
+			enemy_row[0][i] = 0; // do not turn on current column
+			is_column_open = 1; // found open column
+			open_column = i; // open column is column i
+		}
+		
+		else { // either the open column has been filled or result is 1 after %
+			enemy_row[0][i] = 1; // make current column 1 (1 is for red led)s
+		}
+	}
+	return;
 }
 
 int main() {
