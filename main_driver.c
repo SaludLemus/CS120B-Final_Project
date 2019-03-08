@@ -75,7 +75,6 @@ int TickFunct_GameMenu(int state) {
 			else if (game_over) {
 				state = GameMenuEndGame; // go to the end game
 				game_on = 0; // stop all activity
-				PORTA |= 0x0F; // set least sig. bits in case of transmit_data() called
 			}
 			break;
 			
@@ -86,6 +85,7 @@ int TickFunct_GameMenu(int state) {
 			}
 			else if (!end_game) { // start new game
 				state= GameMenuWait; // wait reset button press
+				PORTA |= 0x0F; // set least sig. bits in case of transmit_data() called
 			}
 			break;
 			
