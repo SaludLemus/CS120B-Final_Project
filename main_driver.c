@@ -196,6 +196,9 @@ int TickFunct_Player(int state) {
 				state = PlayerMove;
 				player_pos_row = 6; // set player position
 				player_pos_col = 4;
+				
+				LCD_ClearScreen();
+				LCD_DisplayString(1, "Current Score:");
 			}
 			else if (!game_on) { // game has not started yet
 				state = PlayerOff;
@@ -470,6 +473,17 @@ int TickFunct_UpdateScore(int state) {
 				// and have not updated the score for the current enemy
 				if (!is_scored && (player_pos_row > enemy_row_num)) {
 					++player_score; // add one to current score
+					
+					// update score on LCD
+					LCD_Cursor(13);
+					if (player_score > 9) { // score is 10 or more
+						LCD_WriteData((player_score / 10) + '0'); // left digit
+						LCD_WriteData((player_score % 10) + '0'); // right digit
+					}
+					else { // score is 0 through 9
+						LCD_WriteData(player_score + '0');
+					}
+					
 					is_scored = 1; // not update anymore until new enemy is generated
 					
 					if (enemy_period > 200) { // make enemy move faster (i.e. tick faster)
