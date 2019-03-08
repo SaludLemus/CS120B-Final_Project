@@ -17,13 +17,6 @@
 #include "joystick.h"
 #include "led_matrix_display.h"
 
-typedef struct _task {
-	unsigned char state; // current state in SM
-	unsigned long int* period; // task's period to tick
-	unsigned long int elapsedTime; // how long has passed
-	int (*TickFct)(int); // tick function
-} task;
-
 enum GameMenuStates {GameMenuInit, GameMenuOff, GameMenuPlay,
 					 GameMenuEndGame, GameMenuWait} game_menu_state;
 
@@ -560,11 +553,11 @@ int TickFunct_Endgame(int state) {
 			}
 			break;
 		case EndGameGameOver:
-			if (i < 2) { // display game over message for 2 seconds
+			if (i < 40) { // display game over message for 2 seconds
 				state = EndGameGameOver;
 				++i;
 			}
-			else if (!(i < 2)) { // display player's score
+			else if (!(i < 40)) { // display player's score
 				state = EndGamePlayerScore;
 				i = 0;
 				
@@ -582,11 +575,11 @@ int TickFunct_Endgame(int state) {
 			}
 			break;
 		case EndGamePlayerScore:
-			if (i < 2) { // display player's score for 2 seconds
+			if (i < 40) { // display player's score for 2 seconds
 				state = EndGamePlayerScore;
 				++i;
 			}
-			else if (!(i < 2)) { // display high score for 2 seconds
+			else if (!(i < 40)) { // display high score for 2 seconds
 				state = EndGameHighScore;
 				i = 0;
 				
@@ -597,11 +590,11 @@ int TickFunct_Endgame(int state) {
 			}
 			break;
 		case EndGameHighScore:
-			if (i < 2) { // display new high score message for 1 second and the high score for 1 second
+			if (i < 40) { // display new high score message for 1 second and the high score for 1 second
 				state = EndGameHighScore;
 				++i;
 			}
-			else if (!(i < 2)) { // end game results are over --> wait for game to start over
+			else if (!(i < 40)) { // end game results are over --> wait for game to start over
 				state = EndGameOff;
 				i = 0;
 				end_game = 0; // allow button press
@@ -653,10 +646,25 @@ int TickFunct_Endgame(int state) {
 	return state;
 }
 
+typedef struct _task {
+	unsigned char state; // current state in SM
+	unsigned long int* period; // task's period to tick
+	unsigned long int elapsedTime; // how long has passed
+	int (*TickFct)(int); // tick function
+} task;
+
 int main() {
 	 DDRD = 0xFF; PORTD = 0x00; // PD is output (shift register handles red leds)
 	 DDRA = 0xF0; PORTA = 0x0F; // PA is output
 	 DDRB = 0xFF; PORTB = 0x00; // PB is output (shift register handles blue leds)
+	 
+	 // periods of the SMs (all in ms)
+	 unsigned long int GameMenu_Period = 50;
+	 unsigned long int Display_Period = 1;
+	 unsigned long int HitDetection_Period = 10;
+	 unsigned long int Player_Period = 50;
+	 unsigned long int UpdateScore_Period = 10;
+	 unsigned long int EndGame_Period = 50;
 	 
 	 ADC_init();
 	 
