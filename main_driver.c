@@ -199,6 +199,7 @@ int TickFunct_Player(int state) {
 				
 				LCD_ClearScreen();
 				LCD_DisplayString(1, "Current Score:");
+				LCD_Cursor(13); LCD_WriteData('0');
 			}
 			else if (!game_on) { // game has not started yet
 				state = PlayerOff;
