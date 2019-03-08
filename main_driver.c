@@ -11,6 +11,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdlib.h> // used for generating random numbers
+#include <avr/eeprom.h> // used for getting the highest score from memory after the game ends
 #include "io.c"
 #include "timer.h"
 #include "joystick.h"
@@ -503,55 +504,132 @@ enum EndGameStates {EndGameInit, EndGameOff, EndGamePlaying,
 					EndGameEndGame, EndGameGameOver, EndGamePlayerScore,
 					EndGameHighScore} end_game_state;
 
+unsigned char i = 0;
+uint8_t *hs_mem_loc;
+uint8_t high_score;
+
 int TickFunct_Endgame(int state) {
 	
-	switch (state) {
+	switch (state) { // state transitions
 		case EndGameInit:
 			state = EndGameOff;
+			i = 0;
+			hs_mem_loc = (uint8_t*)2;
+			high_score = 0;
 			break;
 		case EndGameOff:
-		
+			if (game_on) { // game is about to start
+				state = EndGamePlaying;
+				i = 0;
+				hs_mem_loc = (uint8_t *)2;
+				high_score = 0;
+			}
+			else if (!game_on) { // button still not pressed
+				state = EndGameOff;
+			}
 			break;
 		case EndGamePlaying:
-		
+			if (game_on) { // game is still going on
+				state = EndGamePlaying;
+			}
+			else if (!game_on) { // game ended
+				state = EndGameEndGame;
+				end_game = 1; // complete end game results --> display score and high score
+			}
 			break;
 		case EndGameEndGame:
-		
+			if (1) {
+				state = EndGameGameOver;
+				LCD_ClearScreen(); // clear LCD
+				LCD_DisplayString(4, "Game Over!"); // display game over string
+			}
 			break;
 		case EndGameGameOver:
-		
+			if (i < 2) { // display game over message for 2 seconds
+				state = EndGameGameOver;
+				++i;
+			}
+			else if (!(i < 2)) { // display player's score
+				state = EndGamePlayerScore;
+				i = 0;
+				
+				// write player's score to LCD
+				LCD_ClearScreen();
+				LCD_DisplayString(1, "Your Score:");
+				LCD_Cursor(13);
+				if (player_score > 9) { // score is 10 or more
+					LCD_WriteData((player_score / 10) + '0'); // left digit
+					LCD_WriteData((player_score % 10) + '0'); // right digit
+				}
+				else { // score is 0 through 9
+					LCD_WriteData(player_score + '0');
+				}
+			}
 			break;
 		case EndGamePlayerScore:
-			
+			if (i < 2) { // display player's score for 2 seconds
+				state = EndGamePlayerScore;
+				++i;
+			}
+			else if (!(i < 2)) { // display high score for 2 seconds
+				state = EndGameHighScore;
+				i = 0;
+				
+				LCD_ClearScreen();
+				
+				// grab high score from eeprom
+				high_score = eeprom_read_byte(hs_mem_loc);
+			}
 			break;
 		case EndGameHighScore:
-		
+			if (i < 2) { // display new high score message for 1 second and the high score for 1 second
+				state = EndGameHighScore;
+				++i;
+			}
+			else if (!(i < 2)) { // end game results are over --> wait for game to start over
+				state = EndGameOff;
+				i = 0;
+				end_game = 0; // allow button press
+			}
 			break;
 		default:
 			state = EndGameInit;
 			break;
 	}
 	
-	switch (state) {
+	switch (state) { // state actions
 		case EndGameInit:
 			break;
 		case EndGameOff:
-		
 			break;
 		case EndGamePlaying:
-		
 			break;
 		case EndGameEndGame:
-		
 			break;
 		case EndGameGameOver:
-		
 			break;
 		case EndGamePlayerScore:
-		
 			break;
 		case EndGameHighScore:
-		
+			if (i == 1) { // display new high score message if score is greater than number in eeprom
+				if (player_score > high_score) { // new high score
+					LCD_DisplayString(2, "New High Score!");
+					eeprom_update_byte(hs_mem_loc, player_score); // update high score in memory
+					high_score = eeprom_read_byte(hs_mem_loc); // update high score variable
+				}
+			}
+			else if (i == 2) { // display high score
+				LCD_ClearScreen();
+				LCD_DisplayString(1, "High Score:");
+				LCD_Cursor(13);
+				if (high_score > 9) { // score is 10 or more
+					LCD_WriteData((high_score / 10) + '0'); // left digit
+					LCD_WriteData((high_score % 10) + '0'); // right digit
+				}
+				else { // score is 0 through 9
+					LCD_WriteData(high_score + '0');
+				}
+			}
 			break;
 		default:
 			break;
