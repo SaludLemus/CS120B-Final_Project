@@ -665,51 +665,77 @@ int main() {
 	 unsigned long int Player_Period = 50;
 	 unsigned long int UpdateScore_Period = 10;
 	 unsigned long int EndGame_Period = 50;
+	 unsigned long int common_period = 1;
+	 
+	 static task GameMenuTask, DisplayTask, HitDetectionTask, PlayerTask, UpdateScoreTask, EndGameTask, EnemyTask;
+	 
+	 task *tasks[] = {&GameMenuTask, &PlayerTask, &UpdateScoreTask,
+					  &EnemyTask, &DisplayTask, &HitDetectionTask, &EndGameTask};
+	 
+	 const unsigned short num_tasks = sizeof(tasks)/ sizeof(task*); // number of tasks to execute
+	 
+	 // GameMenu Task Init.
+	 GameMenuTask.period = &GameMenu_Period;
+	 GameMenuTask.state = GameMenuInit;
+	 GameMenuTask.elapsedTime = (*GameMenuTask.period);
+	 GameMenuTask.TickFct = &TickFunct_GameMenu;
+	 
+	 // Display Task Init.
+	 DisplayTask.period = &Display_Period;
+	 DisplayTask.state = DisplayInit;
+	 DisplayTask.elapsedTime = (*DisplayTask.period);
+	 DisplayTask.TickFct = TickFunct_Display;
+	 
+	 // HitDetection Task Init.
+	 HitDetectionTask.period = &HitDetection_Period;
+	 HitDetectionTask.state = HitDectectionInit;
+	 HitDetectionTask.elapsedTime = (*HitDetectionTask.period);
+	 HitDetectionTask.TickFct = TickFunct_HitDetection;
+	 
+	 // Player Task Init.
+	 PlayerTask.period = &Player_Period;
+	 PlayerTask.state = PlayerInit;
+	 PlayerTask.elapsedTime = (*PlayerTask.period);
+	 PlayerTask.TickFct = TickFunct_Player;
+	 
+	 // UpdateScore Task Init.
+	 UpdateScoreTask.period = &UpdateScore_Period;
+	 UpdateScoreTask.state = UpdateScoreInit;
+	 UpdateScoreTask.elapsedTime = (*UpdateScoreTask.period);
+	 UpdateScoreTask.TickFct = TickFunct_UpdateScore;
+	 
+	 // EndGame Task Init.
+	 EndGameTask.period = &EndGame_Period;
+	 EndGameTask.state = EndGameInit;
+	 EndGameTask.elapsedTime = (*EndGameTask.period);
+	 EndGameTask.TickFct = TickFunct_Endgame;
+	 
+	 // Enemy Task Init.
+	 EnemyTask.period = &enemy_period;
+	 EnemyTask.state = EnemyInit;
+	 EnemyTask.elapsedTime = (*EnemyTask.period);
+	 EnemyTask.TickFct = TickFunct_Enemy;
 	 
 	 ADC_init();
 	 
 	 TimerSet(1); // 1ms
 	 TimerOn();
 	 
-	 unsigned char joystick_timer = 50;
-	 while (1) {
-		 if (joystick_timer >= 50) {
-			 joystick_position = getJoystickInput();
-			 game_map[player_pos_row][player_pos_col] = 0;
-			 switch (joystick_position) {
-				 case UP:
-					if (player_pos_row > 0) {--player_pos_row;}
-					break;
-				 case DOWN:
-					if (player_pos_row < 7) {++player_pos_row;}
-					break;
-				 case LEFT:
-					if (player_pos_col > 0) {--player_pos_col;}
-					break;
-				 case RIGHT:
-					if (player_pos_col < 7) {++player_pos_col;}
-					break;
-				 default:
-					break;
+	 LCD_init();
+	 LCD_ClearScreen();
+	
+	 unsigned short i; // iterator for scheduler
+	 while(1) {
+		 // check if any task is ready to tick
+		 for (i = 0; i < num_tasks; ++i) {
+			 if (tasks[i]->elapsedTime >= *(tasks[i]->period)) { // tick once time passed is >= period
+				 tasks[i]->state = tasks[i]->TickFct(tasks[i]->state); // call tick() and get new state
+				 tasks[i]->elapsedTime = 0; // reset
 			 }
-			 game_map[player_pos_row][player_pos_col] = 3;
-			 joystick_timer = 0;
+			 tasks[i]->elapsedTime += common_period; // increment by common period
 		 }
-		 displayLEDMatrix();
-		/*transmit_data(0, 0);
-		transmit_data(0xFE, 1);
-		transmit_data(0x7F, 3);
-		transmit_data(0x01, 0);
 		 while (!TimerFlag) {}
-		 TimerFlag = 0; // start over
-		 transmit_data(0, 0);
-		  transmit_data(0xFE, 3);
-		  transmit_data(0x7F, 1);
-		 transmit_data(0x80, 0);*/
-		 while (!TimerFlag) {}
-		 TimerFlag = 0; // start over
-		 joystick_timer += 1;
-		 //PORTB = 0;
+		 TimerFlag = 0; // reset
 	 }
 }
 
