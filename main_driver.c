@@ -447,13 +447,13 @@ int TickFunct_UpdateScore(int state) {
 		case UpdateScoreInit:
 			state = UpdateScoreOff;
 			player_score = 0;
-			enemy_period = 1500;
+			enemy_period = 1000;
 			break;
 		case UpdateScoreOff:
 			if (game_on) { // the game is about to start
 				state = UpdateScoreOn;
 				player_score = 0;
-				enemy_period = 1500; // the enemy moves (i.e. ticks) every 1 and a half seconds
+				enemy_period = 1000; // the enemy moves (i.e. ticks) every 1 and a half seconds
 			}
 			else if (!game_on) { // the user still has not pressed the button
 				state = UpdateScoreOff;
@@ -481,7 +481,7 @@ int TickFunct_UpdateScore(int state) {
 					is_scored = 1; // not update anymore until new enemy is generated
 					
 					if (enemy_period > 200) { // make enemy move faster (i.e. tick faster)
-						enemy_period -= 150;	
+						enemy_period -= 150;
 					}
 				}
 			}
