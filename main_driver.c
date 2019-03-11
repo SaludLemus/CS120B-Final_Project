@@ -363,17 +363,16 @@ int TickFunct_Enemy(int state) {
 
 void generateNewEnemy() {
 	unsigned char i;
-	unsigned short random_num;
-	
+	unsigned short new_open_column; // where to place the open column (0 to 7)
+
+	new_open_column = ((unsigned short)(rand())) % 8; // generate random number
 	for (i = 0; i < 8; ++i) { // iterate through columns and fill them with 0 or 1
-		random_num = ((unsigned short)(rand())) % 2; // generate random number
-		
-		if ((random_num == 0) && !is_column_open) { // found open column for enemy row
+		if (i == new_open_column) { // found open column for enemy row
 			enemy_row[0][i] = 0; // do not turn on current column
 			is_column_open = 1; // found open column
 			open_column = i; // open column is column i
 		}
-		else if (i == 7 && !is_column_open) { // make the last column not light up if not achieved before
+		else if (i == 7 && !is_column_open) { // make the last column not light up if not achieved before (precaution)
 			is_column_open = 1;
 			enemy_row[0][i] = 0;
 			open_column = i;
