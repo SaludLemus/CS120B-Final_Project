@@ -483,6 +483,9 @@ int TickFunct_UpdateScore(int state) {
 					if (enemy_period > 200) { // make enemy move faster (i.e. tick faster)
 						enemy_period -= 150;
 					}
+					else if (!(enemy_period > 200) && enemy_period > 50) { // increase tick rate by 50 ms
+						enemy_period -=50;
+					}
 				}
 			}
 			else if (!game_on) { // the game is over
@@ -658,6 +661,7 @@ int main() {
 	 DDRA = 0xF0; PORTA = 0x0F; // PA is output
 	 DDRB = 0xFF; PORTB = 0x00; // PB is output (shift register handles blue leds)
 	 
+
 	 // periods of the SMs (all in ms)
 	 unsigned long int GameMenu_Period = 50;
 	 unsigned long int Display_Period = 1;
