@@ -191,8 +191,8 @@ int TickFunct_Player(int state) {
 				player_pos_col = 4;
 				
 				LCD_ClearScreen();
-				LCD_DisplayString(1, "Current Score:");
-				LCD_Cursor(13); LCD_WriteData('0');
+				LCD_DisplayString(1, "Score:"); // so single and double digit can fit on the same row
+				LCD_Cursor(8); LCD_WriteData('0');
 			}
 			else if (!game_on) { // game has not started yet
 				state = PlayerOff;
@@ -464,11 +464,12 @@ int TickFunct_UpdateScore(int state) {
 				
 				// update score when the player's row is greater than the enemy's row
 				// and have not updated the score for the current enemy
-				if (!is_scored && (player_pos_row > enemy_row_num)) {
+				if ((!is_scored && (player_pos_row < enemy_row_num) && (enemy_row_num != -1))
+						|| (!is_scored && player_pos_row == 7 && enemy_row_num == 7 && player_pos_col == open_column)) {
 					++player_score; // add one to current score
 					
 					// update score on LCD
-					LCD_Cursor(13);
+					LCD_Cursor(8);
 					if (player_score > 9) { // score is 10 or more
 						LCD_WriteData((player_score / 10) + '0'); // left digit
 						LCD_WriteData((player_score % 10) + '0'); // right digit
@@ -659,7 +660,7 @@ int main() {
 	 DDRD = 0xFF; PORTD = 0x00; // PD is output (shift register handles red leds)
 	 DDRA = 0xF0; PORTA = 0x0F; // PA is output
 	 DDRB = 0xFF; PORTB = 0x00; // PB is output (shift register handles blue leds)
-	 
+	 DDRC = 0xFF; PORTC = 0x00;
 
 	 // periods of the SMs (all in ms)
 	 unsigned long int GameMenu_Period = 50;
