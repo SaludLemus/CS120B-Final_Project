@@ -323,15 +323,19 @@ int TickFunct_Enemy(int state) {
 				}
 				else if (!(enemy_row_num < 7)) {
 					 // enemy is on the last row --> "delete it" and "replace it" with a new enemy (i.e. start over)
-					 for (i = 0; i < 8; ++i) { // delete current row's columns
-						 game_map[enemy_row_num][i] = 0; // assign 0 --> do not turn led on
+					 if (enemy_row_num == 7) {
+						 for (i = 0; i < 8; ++i) { // delete current row's columns
+							 game_map[enemy_row_num][i] = 0; // assign 0 --> do not turn led on
+						 }
+						 ++enemy_row_num;
 					 }
-					 
-					 enemy_row_num = -1; // go back to row -1
-					 is_column_open = 0; // reset bool var
-					 open_column = -1; // get new open column
-					 is_scored = 0; // reset
-					 generateNewEnemy(); // generate new enemy
+					 else {
+						enemy_row_num = -1; // go back to row -1
+						is_column_open = 0; // reset bool var
+						 open_column = -1; // get new open column
+						is_scored = 0; // reset
+						 generateNewEnemy(); // generate new enemy
+					 }
 				}
 			}
 			else if (!game_on) { // game is over --> reset local variables
@@ -464,8 +468,7 @@ int TickFunct_UpdateScore(int state) {
 				
 				// update score when the player's row is greater than the enemy's row
 				// and have not updated the score for the current enemy
-				if ((!is_scored && (player_pos_row < enemy_row_num) && (enemy_row_num != -1))
-						|| (!is_scored && player_pos_row == 7 && enemy_row_num == 7 && player_pos_col == open_column)) {
+				if (!is_scored && (player_pos_row < enemy_row_num) && (enemy_row_num != -1)) {
 					++player_score; // add one to current score
 					
 					// update score on LCD
