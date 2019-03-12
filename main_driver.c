@@ -323,13 +323,13 @@ int TickFunct_Enemy(int state) {
 				}
 				else if (!(enemy_row_num < 7)) {
 					 // enemy is on the last row --> "delete it" and "replace it" with a new enemy (i.e. start over)
-					 if (enemy_row_num == 7) {
+					 if (enemy_row_num == 7) { // added extra tick in case of player's row is 7 and enemy's row is 7
 						 for (i = 0; i < 8; ++i) { // delete current row's columns
 							 game_map[enemy_row_num][i] = 0; // assign 0 --> do not turn led on
 						 }
 						 ++enemy_row_num;
 					 }
-					 else {
+					 else { // generate new enemy when enemy_row_num > 7
 						enemy_row_num = -1; // go back to row -1
 						is_column_open = 0; // reset bool var
 						 open_column = -1; // get new open column
