@@ -1,7 +1,7 @@
 #ifndef __JOYSTICK_H__
 #define __JOYSTICK_H__
 
-// copied from internet
+// Function: "ADC_init()" copied from internet
 // LINK: http://maxembedded.com/2011/06/the-adc-of-the-avr/
 void ADC_init() {
 	// AREF = AVcc
@@ -12,7 +12,7 @@ void ADC_init() {
 	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
-// also copied from internet
+// Function: "adc_read()" also copied from internet
 // LINK: http://maxembedded.com/2011/06/the-adc-of-the-avr/
 uint16_t adc_read(uint8_t ch) {
 	// select the corresponding channel 0~7
