@@ -516,11 +516,12 @@ int TickFunct_UpdateScore(int state) {
 
 enum EndGameStates {EndGameInit, EndGameOff, EndGamePlaying,
 					EndGameEndGame, EndGameGameOver, EndGamePlayerScore,
-					EndGameHighScore} end_game_state;
+					EndGameHighScoreDisplay, EndGameHighScore} end_game_state;
 
 unsigned char i = 0;
 uint8_t *hs_mem_loc;
 uint8_t high_score;
+unsigned char is_new_score;
 
 int TickFunct_Endgame(int state) {
 	
@@ -530,6 +531,7 @@ int TickFunct_Endgame(int state) {
 			i = 0;
 			hs_mem_loc = (uint8_t*)2;
 			high_score = 0;
+			is_new_score = 0;
 			break;
 		case EndGameOff:
 			if (game_on) { // game is about to start
@@ -537,6 +539,7 @@ int TickFunct_Endgame(int state) {
 				i = 0;
 				hs_mem_loc = (uint8_t *)2;
 				high_score = 0;
+				is_new_score = 0;
 			}
 			else if (!game_on) { // button still not pressed
 				state = EndGameOff;
@@ -586,13 +589,30 @@ int TickFunct_Endgame(int state) {
 				++i;
 			}
 			else if (!(i < 40)) { // display high score for 2 seconds
-				state = EndGameHighScore;
+				state = EndGameHighScoreDisplay;
 				i = 0;
 				
 				LCD_ClearScreen();
 				
 				// grab high score from eeprom
 				high_score = eeprom_read_byte(hs_mem_loc);
+			}
+			break;
+		case EndGameHighScoreDisplay:
+			if ((player_score > high_score) && (i < 40) || (is_new_score && i < 40)) { // new high score
+				state = EndGameHighScoreDisplay;
+				++i;
+				is_new_score = 1;
+				if (i == 1) {
+					LCD_ClearScreen();
+					LCD_DisplayString(1, "New High Score!");
+					eeprom_update_byte(hs_mem_loc, player_score); // update high score in memory
+					high_score = eeprom_read_byte(hs_mem_loc); // update high score variable
+				}
+			}
+			else if (!(player_score > high_score)) { // no high score
+				state = EndGameHighScore;
+				i = 0;
 			}
 			break;
 		case EndGameHighScore:
@@ -624,15 +644,10 @@ int TickFunct_Endgame(int state) {
 			break;
 		case EndGamePlayerScore:
 			break;
+		case EndGameHighScoreDisplay:
+			break;
 		case EndGameHighScore:
-			if (i == 1) { // display new high score message if score is greater than number in eeprom
-				if (player_score > high_score) { // new high score
-					LCD_DisplayString(2, "New High Score!");
-					eeprom_update_byte(hs_mem_loc, player_score); // update high score in memory
-					high_score = eeprom_read_byte(hs_mem_loc); // update high score variable
-				}
-			}
-			else if (i == 2) { // display high score
+			if (i == 1) { // display high score
 				LCD_ClearScreen();
 				LCD_DisplayString(1, "High Score:");
 				LCD_Cursor(13);
